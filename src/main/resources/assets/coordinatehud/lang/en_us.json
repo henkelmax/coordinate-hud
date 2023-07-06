@@ -1,0 +1,17 @@
+{
+  "message.coordinatehud.disable": "Disable",
+  "message.coordinatehud.enable": "Enable",
+  "message.coordinatehud.remove": "Remove",
+  "message.coordinatehud.rename": "Rename",
+  "message.coordinatehud.waypoint_not_found": "Waypoint not found",
+  "message.coordinatehud.no_waypoints_found": "No waypoints found",
+  "message.coordinatehud.enabled_waypoint": "Enabled waypoint %s",
+  "message.coordinatehud.disabled_waypoint": "Disabled waypoint %s",
+  "message.coordinatehud.renamed_waypoint": "Renamed waypoint %s to %s",
+  "message.coordinatehud.added_waypoint": "Added waypoint %s",
+  "message.coordinatehud.removed_waypoint": "Removed waypoint %s",
+  "cloth_config.coordinatehud.settings": "CoordinateHUD Settings",
+  "cloth_config.coordinatehud.category.general": "General",
+  "cloth_config.coordinatehud.waypoint_distance": "Waypoint distance",
+  "cloth_config.coordinatehud.waypoint_distance.description": "At this distance a waypoint will not get any smaller on the screen"
+}
