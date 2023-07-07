@@ -22,9 +22,15 @@ public class ClothConfigIntegration {
         ConfigCategory general = builder.getOrCreateCategory(Component.translatable("cloth_config.coordinatehud.category.general"));
 
         general.addEntry(fromConfigEntry(entryBuilder,
-                Component.translatable("cloth_config.coordinatehud.waypoint_distance"),
-                Component.translatable("cloth_config.coordinatehud.waypoint_distance.description"),
-                CoordinateHUD.CLIENT_CONFIG.waypointDistance
+                Component.translatable("cloth_config.coordinatehud.waypoint_scale_distance"),
+                Component.translatable("cloth_config.coordinatehud.waypoint_scale_distance.description"),
+                CoordinateHUD.CLIENT_CONFIG.waypointScaleDistance
+        ));
+
+        general.addEntry(fromConfigEntry(entryBuilder,
+                Component.translatable("cloth_config.coordinatehud.show_waypoint_distance"),
+                Component.translatable("cloth_config.coordinatehud.show_waypoint_distance.description"),
+                CoordinateHUD.CLIENT_CONFIG.showWaypointDistance
         ));
 
         return builder.build();

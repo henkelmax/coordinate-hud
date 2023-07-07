@@ -6,12 +6,15 @@ import com.mojang.math.Axis;
 import de.maxhenkel.coordinatehud.CoordinateHUD;
 import de.maxhenkel.coordinatehud.Waypoint;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -80,8 +83,16 @@ public class RenderEvents {
         stack.scale(textScale, textScale, textScale);
 
         if (isLookingAtWaypoint(mainCamera, waypointPos)) {
-            font.drawInBatch(waypoint.getName(), offsetX, offsetY, 0xFFFFFF, false, stack.last().pose(), context.consumers(), Font.DisplayMode.SEE_THROUGH, 255, LightTexture.FULL_BRIGHT);
-            font.drawInBatch(waypoint.getName(), offsetX, offsetY, 0xFFFFFF, false, stack.last().pose(), context.consumers(), Font.DisplayMode.NORMAL, 255, LightTexture.FULL_BRIGHT);
+            MutableComponent name;
+            if (CoordinateHUD.CLIENT_CONFIG.showWaypointDistance.get()) {
+                name = Component.translatable("message.coordinatehud.waypoint_name_distance", waypoint.getName(), (int) mainCamera.getPosition().distanceTo(waypoint.getPos().getCenter()));
+            } else {
+                name = Component.translatable("message.coordinatehud.waypoint_name", waypoint.getName());
+            }
+            name.withStyle(ChatFormatting.WHITE);
+
+            font.drawInBatch(name, offsetX, offsetY, 0, false, stack.last().pose(), context.consumers(), Font.DisplayMode.SEE_THROUGH, 255, LightTexture.FULL_BRIGHT);
+            font.drawInBatch(name, offsetX, offsetY, 0, false, stack.last().pose(), context.consumers(), Font.DisplayMode.NORMAL, 255, LightTexture.FULL_BRIGHT);
         }
 
         stack.popPose();
@@ -89,7 +100,7 @@ public class RenderEvents {
     }
 
     private static Vec3 getFakePos(Camera camera, Vec3 pos) {
-        Integer waypointDistance = CoordinateHUD.CLIENT_CONFIG.waypointDistance.get();
+        Integer waypointDistance = CoordinateHUD.CLIENT_CONFIG.waypointScaleDistance.get();
         Vec3 cameraPos = camera.getPosition();
 
         if (cameraPos.distanceTo(pos) < waypointDistance) {
@@ -101,7 +112,7 @@ public class RenderEvents {
     }
 
     private static boolean isLookingAtWaypoint(Camera camera, Vec3 waypointPos) {
-        Integer waypointDistance = CoordinateHUD.CLIENT_CONFIG.waypointDistance.get();
+        Integer waypointDistance = CoordinateHUD.CLIENT_CONFIG.waypointScaleDistance.get();
         Vec3 cameraPos = camera.getPosition();
         Vec3 dir = new Vec3(camera.getLookVector().x, camera.getLookVector().y, camera.getLookVector().z);
         Vec3 waypointDir = waypointPos.subtract(cameraPos).normalize();

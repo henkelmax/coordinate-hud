@@ -10,8 +10,12 @@
   "message.coordinatehud.renamed_waypoint": "Renamed waypoint %s to %s",
   "message.coordinatehud.added_waypoint": "Added waypoint %s",
   "message.coordinatehud.removed_waypoint": "Removed waypoint %s",
+  "message.coordinatehud.waypoint_name_distance": "%s (%sm)",
+  "message.coordinatehud.waypoint_name": "%s",
   "cloth_config.coordinatehud.settings": "CoordinateHUD Settings",
   "cloth_config.coordinatehud.category.general": "General",
-  "cloth_config.coordinatehud.waypoint_distance": "Waypoint distance",
-  "cloth_config.coordinatehud.waypoint_distance.description": "At this distance a waypoint will not get any smaller on the screen"
+  "cloth_config.coordinatehud.waypoint_scale_distance": "Waypoint scale distance",
+  "cloth_config.coordinatehud.waypoint_scale_distance.description": "At this distance a waypoint will not get any smaller on the screen",
+  "cloth_config.coordinatehud.show_waypoint_distance": "Show waypoint distance",
+  "cloth_config.coordinatehud.show_waypoint_distance.description": "Whether to show the distance to a waypoint"
 }

@@ -5,10 +5,12 @@ import de.maxhenkel.configbuilder.ConfigEntry;
 
 public class ClientConfig {
 
-    public final ConfigEntry<Integer> waypointDistance;
+    public final ConfigEntry<Integer> waypointScaleDistance;
+    public final ConfigEntry<Boolean> showWaypointDistance;
 
     public ClientConfig(ConfigBuilder builder) {
-        waypointDistance = builder.integerEntry("waypoint_distance", 24, 8, Integer.MAX_VALUE);
+        showWaypointDistance = builder.booleanEntry("show_waypoint_distance", true);
+        waypointScaleDistance = builder.integerEntry("waypoint_scale_distance", 24, 8, Integer.MAX_VALUE);
     }
 
 }
