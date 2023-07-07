@@ -81,6 +81,7 @@ public class RenderEvents {
 
         if (isLookingAtWaypoint(mainCamera, waypointPos)) {
             font.drawInBatch(waypoint.getName(), offsetX, offsetY, 0xFFFFFF, false, stack.last().pose(), context.consumers(), Font.DisplayMode.SEE_THROUGH, 255, LightTexture.FULL_BRIGHT);
+            font.drawInBatch(waypoint.getName(), offsetX, offsetY, 0xFFFFFF, false, stack.last().pose(), context.consumers(), Font.DisplayMode.NORMAL, 255, LightTexture.FULL_BRIGHT);
         }
 
         stack.popPose();
