@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "coordinatehud",
-  "version": "${version}",
+  "version": "${mod_version}",
   "name": "Coordinate HUD",
   "description": "",
   "authors": [
@@ -22,15 +22,14 @@
     "coordinatehud.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=${loader_version}",
-    "minecraft": "${minecraft_dependency}",
-    "java": ">=17"
+    "fabricloader": "${fabric_loader_dependency}",
+    "minecraft": "${minecraft_dependency}"
   },
   "suggests": {
     "modmenu": ">=${modmenu_version}",
     "cloth-config2": ">=${cloth_config_version}"
   },
   "breaks": {
-    "fabric-api": "<${min_fabric_version}"
+    "fabric-api": "${fabric_api_dependency_breaks}"
   }
 }

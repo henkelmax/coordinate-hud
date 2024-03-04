@@ -30,7 +30,7 @@ public class CoordinateHUD implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         Path configFolder = FabricLoader.getInstance().getConfigDir().resolve(MODID);
-        CLIENT_CONFIG = ConfigBuilder.build(configFolder.resolve("coordinatehud.properties"), ClientConfig::new);
+        CLIENT_CONFIG = ConfigBuilder.builder(ClientConfig::new).path(configFolder.resolve("coordinatehud.properties")).build();
 
         ClientCommandRegistrationCallback.EVENT.register(WaypointCommand::register);
         WorldRenderEvents.AFTER_ENTITIES.register(RenderEvents::render);
