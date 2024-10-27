@@ -23,7 +23,7 @@ import java.util.List;
 
 public class RenderEvents {
 
-    private static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation(CoordinateHUD.MODID, "textures/icons/waypoint.png");
+    private static final ResourceLocation TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint.png");
 
     public static void render(WorldRenderContext context) {
         Minecraft minecraft = Minecraft.getInstance();
@@ -130,13 +130,12 @@ public class RenderEvents {
 
     private static void vertex(VertexConsumer builder, PoseStack matrixStack, float x, float y, float z, float u, float v, int alpha) {
         PoseStack.Pose entry = matrixStack.last();
-        builder.vertex(entry.pose(), x, y, z)
-                .color(255, 255, 255, alpha)
-                .uv(u, v)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(LightTexture.FULL_BRIGHT)
-                .normal(entry.normal(), 0F, 0F, -1F)
-                .endVertex();
+        builder.addVertex(entry.pose(), x, y, z)
+                .setColor(255, 255, 255, alpha)
+                .setUv(u, v)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setNormal( 0F, 0F, -1F);
     }
 
 

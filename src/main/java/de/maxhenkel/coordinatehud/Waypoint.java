@@ -107,7 +107,7 @@ public class Waypoint {
             JsonObject object = json.getAsJsonObject();
             UUID id = UUID.fromString(object.get("id").getAsString());
             String name = object.get("name").getAsString();
-            ResourceLocation dimension = new ResourceLocation(object.get("dimension").getAsString());
+            ResourceLocation dimension = ResourceLocation.tryParse(object.get("dimension").getAsString());
             int x = object.get("x").getAsInt();
             int y = object.get("y").getAsInt();
             int z = object.get("z").getAsInt();

@@ -6,9 +6,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import de.maxhenkel.coordinatehud.CoordinateHUD;
 import de.maxhenkel.coordinatehud.Waypoint;
-import dev.xpple.clientarguments.arguments.CBlockPosArgumentType;
-import dev.xpple.clientarguments.arguments.CDimensionArgumentType;
-import dev.xpple.clientarguments.arguments.CUuidArgumentType;
+import dev.xpple.clientarguments.arguments.CBlockPosArgument;
+import dev.xpple.clientarguments.arguments.CDimensionArgument;
+import dev.xpple.clientarguments.arguments.CUuidArgument;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.ChatFormatting;
@@ -16,7 +16,9 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 
@@ -27,21 +29,21 @@ public class WaypointCommand {
 
         coords.executes(WaypointCommand::list);
 
-        coords.then(ClientCommandManager.literal("create").then(ClientCommandManager.argument("location", CBlockPosArgumentType.blockPos()).then(ClientCommandManager.argument("name", StringArgumentType.string()).executes(context -> {
-            BlockPos location = CBlockPosArgumentType.getCBlockPos(context, "location");
+        coords.then(ClientCommandManager.literal("create").then(ClientCommandManager.argument("location", CBlockPosArgument.blockPos()).then(ClientCommandManager.argument("name", StringArgumentType.string()).executes(context -> {
+            BlockPos location = CBlockPosArgument.getBlockPos(context, "location");
             String name = StringArgumentType.getString(context, "name");
             return addWaypoint(context, name, location, context.getSource().getWorld().dimension().location());
         }))));
 
-        coords.then(ClientCommandManager.literal("create").then(ClientCommandManager.argument("location", CBlockPosArgumentType.blockPos()).then(ClientCommandManager.argument("dimension", CDimensionArgumentType.dimension()).then(ClientCommandManager.argument("name", StringArgumentType.string()).executes(context -> {
-            BlockPos location = CBlockPosArgumentType.getCBlockPos(context, "location");
-            CDimensionArgumentType.DimensionArgument dimension = CDimensionArgumentType.getCDimensionArgument(context, "dimension");
+        coords.then(ClientCommandManager.literal("create").then(ClientCommandManager.argument("location", CBlockPosArgument.blockPos()).then(ClientCommandManager.argument("dimension", CDimensionArgument.dimension()).then(ClientCommandManager.argument("name", StringArgumentType.string()).executes(context -> {
+            BlockPos location = CBlockPosArgument.getBlockPos(context, "location");
+            ResourceKey<Level> dimension = CDimensionArgument.getDimension(context, "dimension");
             String name = StringArgumentType.getString(context, "name");
-            return addWaypoint(context, name, location, dimension.getRegistryKey().location());
+            return addWaypoint(context, name, location, dimension.location());
         })))));
 
-        coords.then(ClientCommandManager.literal("remove").then(ClientCommandManager.argument("id", CUuidArgumentType.uuid()).executes(context -> {
-            UUID id = CUuidArgumentType.getCUuid(context, "id");
+        coords.then(ClientCommandManager.literal("remove").then(ClientCommandManager.argument("id", CUuidArgument.uuid()).executes(context -> {
+            UUID id = CUuidArgument.getUuid(context, "id");
             Waypoint waypoint = CoordinateHUD.WAYPOINT_STORE.removeWaypoint(id);
             context.getSource().sendFeedback(Component.translatable("message.coordinatehud.removed_waypoint", waypoint.getName()));
             return 1;
@@ -49,8 +51,8 @@ public class WaypointCommand {
 
         coords.then(ClientCommandManager.literal("list").executes(WaypointCommand::list));
 
-        coords.then(ClientCommandManager.literal("enable").then(ClientCommandManager.argument("id", CUuidArgumentType.uuid()).executes(context -> {
-            UUID id = CUuidArgumentType.getCUuid(context, "id");
+        coords.then(ClientCommandManager.literal("enable").then(ClientCommandManager.argument("id", CUuidArgument.uuid()).executes(context -> {
+            UUID id = CUuidArgument.getUuid(context, "id");
             Waypoint waypoint = CoordinateHUD.WAYPOINT_STORE.getWaypoint(id);
             if (waypoint == null) {
                 context.getSource().sendError(Component.translatable("message.coordinatehud.waypoint_not_found"));
@@ -62,8 +64,8 @@ public class WaypointCommand {
             return 1;
         })));
 
-        coords.then(ClientCommandManager.literal("disable").then(ClientCommandManager.argument("id", CUuidArgumentType.uuid()).executes(context -> {
-            UUID id = CUuidArgumentType.getCUuid(context, "id");
+        coords.then(ClientCommandManager.literal("disable").then(ClientCommandManager.argument("id", CUuidArgument.uuid()).executes(context -> {
+            UUID id = CUuidArgument.getUuid(context, "id");
             Waypoint waypoint = CoordinateHUD.WAYPOINT_STORE.getWaypoint(id);
             if (waypoint == null) {
                 context.getSource().sendError(Component.translatable("message.coordinatehud.waypoint_not_found"));
@@ -75,8 +77,8 @@ public class WaypointCommand {
             return 1;
         })));
 
-        coords.then(ClientCommandManager.literal("rename").then(ClientCommandManager.argument("id", CUuidArgumentType.uuid()).then(ClientCommandManager.argument("name", StringArgumentType.string()).executes(context -> {
-            UUID id = CUuidArgumentType.getCUuid(context, "id");
+        coords.then(ClientCommandManager.literal("rename").then(ClientCommandManager.argument("id", CUuidArgument.uuid()).then(ClientCommandManager.argument("name", StringArgumentType.string()).executes(context -> {
+            UUID id = CUuidArgument.getUuid(context, "id");
             String newName = StringArgumentType.getString(context, "name");
             Waypoint waypoint = CoordinateHUD.WAYPOINT_STORE.getWaypoint(id);
             if (waypoint == null) {
