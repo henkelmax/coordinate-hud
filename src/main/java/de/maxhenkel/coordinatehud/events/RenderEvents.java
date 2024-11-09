@@ -24,7 +24,8 @@ import java.util.List;
 public class RenderEvents {
 
     private static final Minecraft mc = Minecraft.getInstance();
-    private static final ResourceLocation TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint.png");
+    private static final ResourceLocation COLOR_LOCATION = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint_color.png");
+    private static final ResourceLocation OVERLAY_LOCATION = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint_overlay.png");
 
     public static void render(WorldRenderContext context) {
         if (mc.options.hideGui) {
@@ -69,12 +70,17 @@ public class RenderEvents {
         stack.mulPose(Axis.YP.rotationDegrees(180F - mainCamera.getYRot()));
         stack.mulPose(Axis.XP.rotationDegrees(-mainCamera.getXRot()));
 
-        //TODO Split texture in colored and uncolored part
-        VertexConsumer builderSeeThrough = context.consumers().getBuffer(RenderType.textSeeThrough(TEXTURE_LOCATION));
-        vertex(builderSeeThrough, stack, -0.5F, -0.5F, 0F, 0F, 1F, waypoint.getColor(), 0.5F);
-        vertex(builderSeeThrough, stack, 0.5F, -0.5F, 0F, 1F, 1F, waypoint.getColor(), 0.5F);
-        vertex(builderSeeThrough, stack, 0.5F, 0.5F, 0F, 1F, 0F, waypoint.getColor(), 0.5F);
-        vertex(builderSeeThrough, stack, -0.5F, 0.5F, 0F, 0F, 0F, waypoint.getColor(), 0.5F);
+        VertexConsumer color = context.consumers().getBuffer(RenderType.textSeeThrough(COLOR_LOCATION));
+        vertex(color, stack, -0.5F, -0.5F, 0F, 0F, 1F, waypoint.getColor(), 0.5F);
+        vertex(color, stack, 0.5F, -0.5F, 0F, 1F, 1F, waypoint.getColor(), 0.5F);
+        vertex(color, stack, 0.5F, 0.5F, 0F, 1F, 0F, waypoint.getColor(), 0.5F);
+        vertex(color, stack, -0.5F, 0.5F, 0F, 0F, 0F, waypoint.getColor(), 0.5F);
+
+        VertexConsumer overlay = context.consumers().getBuffer(RenderType.textSeeThrough(OVERLAY_LOCATION));
+        vertex(overlay, stack, -0.5F, -0.5F, 0F, 0F, 1F, 0xFFFFFF, 0.5F);
+        vertex(overlay, stack, 0.5F, -0.5F, 0F, 1F, 1F, 0xFFFFFF, 0.5F);
+        vertex(overlay, stack, 0.5F, 0.5F, 0F, 1F, 0F, 0xFFFFFF, 0.5F);
+        vertex(overlay, stack, -0.5F, 0.5F, 0F, 0F, 0F, 0xFFFFFF, 0.5F);
 
         stack.pushPose();
         stack.translate(0D, 1D, 0D);
