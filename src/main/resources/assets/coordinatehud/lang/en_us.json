@@ -1,5 +1,5 @@
 {
-  "key.categories.coordinatehud": "OpenHUD",
+  "key.categories.coordinatehud": "Coordinate HUD",
   "key.coordinatehud.waypoints": "Manage Waypoints",
   "key.coordinatehud.hide_hud": "Hide HUD",
   "key.coordinatehud.create_waypoint": "Create Waypoint",
@@ -39,6 +39,8 @@
   "gui.coordinatehud.create_waypoint.title": "Create Waypoint",
   "cloth_config.coordinatehud.settings": "CoordinateHUD Settings",
   "cloth_config.coordinatehud.category.general": "General",
+  "cloth_config.coordinatehud.hide_hud": "Hide HUD",
+  "cloth_config.coordinatehud.hide_hud.description": "Whether to hide the waypoint icons",
   "cloth_config.coordinatehud.waypoint_scale_distance": "Waypoint scale distance",
   "cloth_config.coordinatehud.waypoint_scale_distance.description": "At this distance a waypoint will not get any smaller on the screen",
   "cloth_config.coordinatehud.show_waypoint_distance": "Show waypoint distance",
