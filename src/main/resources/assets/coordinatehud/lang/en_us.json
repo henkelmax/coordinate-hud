@@ -10,6 +10,7 @@
   "message.coordinatehud.delete": "Delete",
   "message.coordinatehud.coordinates": "%s, %s, %s",
   "message.coordinatehud.distance": "%s blocks away",
+  "message.coordinatehud.dimension": "%s",
   "message.coordinatehud.edit_waypoint.waypoint_name": "Waypoint name",
   "message.coordinatehud.edit_waypoint.coordinates": "Coordinates",
   "message.coordinatehud.edit_waypoint.visible": "Visible",

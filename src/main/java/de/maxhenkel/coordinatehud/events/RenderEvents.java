@@ -43,7 +43,7 @@ public class RenderEvents {
         }
 
         for (Waypoint waypoint : activeWaypoints) {
-            if (!waypoint.getDimension().equals(currentDimension)) {
+            if (!waypoint.getDimension().location().equals(currentDimension)) {
                 continue;
             }
             stack.pushPose();

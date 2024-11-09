@@ -4,7 +4,12 @@ import com.google.gson.*;
 import de.maxhenkel.coordinatehud.screen.ColorPicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -18,12 +23,12 @@ public class Waypoint {
     private final UUID id;
     private String name;
     private long creationTime;
-    private ResourceLocation dimension;
+    private ResourceKey<Level> dimension;
     private BlockPos pos;
     private int color;
     private boolean active;
 
-    private Waypoint(UUID id, String name, long creationTime, ResourceLocation dimension, BlockPos pos, int color, boolean active) {
+    private Waypoint(UUID id, String name, long creationTime, ResourceKey<Level> dimension, BlockPos pos, int color, boolean active) {
         this.id = id;
         this.name = name;
         this.creationTime = creationTime;
@@ -33,8 +38,9 @@ public class Waypoint {
         this.active = active;
     }
 
-    public static Waypoint create(ResourceLocation dimension, BlockPos pos) {
-        return new Waypoint(UUID.randomUUID(), "", System.currentTimeMillis(), dimension, pos, randomColor(), true);
+    public static Waypoint create() {
+        Minecraft mc = Minecraft.getInstance();
+        return new Waypoint(UUID.randomUUID(), "", System.currentTimeMillis(), mc.level == null ? ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld")) : mc.level.dimension(), mc.gameRenderer.getMainCamera().getBlockPosition(), randomColor(), true);
     }
 
     public UUID getId() {
@@ -49,7 +55,7 @@ public class Waypoint {
         return creationTime;
     }
 
-    public ResourceLocation getDimension() {
+    public ResourceKey<Level> getDimension() {
         return dimension;
     }
 
@@ -73,7 +79,7 @@ public class Waypoint {
         this.creationTime = creationTime;
     }
 
-    public void setDimension(ResourceLocation dimension) {
+    public void setDimension(ResourceKey<Level> dimension) {
         this.dimension = dimension;
     }
 
@@ -91,6 +97,18 @@ public class Waypoint {
 
     public double distanceToCamera() {
         return Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().distanceTo(pos.getCenter());
+    }
+
+    public MutableComponent translateDimension() {
+        String[] split = dimension.location().getPath().split("_");
+        StringBuilder builder = new StringBuilder();
+        for (String s : split) {
+            if (s.isEmpty()) {
+                continue;
+            }
+            builder.append(s.substring(0, 1).toUpperCase()).append(s.substring(1)).append(" ");
+        }
+        return Component.literal(builder.toString());
     }
 
     public static int randomColor() {
@@ -119,7 +137,7 @@ public class Waypoint {
             object.addProperty("id", src.getId().toString());
             object.addProperty("name", src.getName());
             object.addProperty("creationTime", src.getCreationTime());
-            object.addProperty("dimension", src.getDimension().toString());
+            object.addProperty("dimension", src.getDimension().location().toString());
             object.addProperty("x", src.getPos().getX());
             object.addProperty("y", src.getPos().getY());
             object.addProperty("z", src.getPos().getZ());
@@ -142,7 +160,18 @@ public class Waypoint {
             } else {
                 creationTime = System.currentTimeMillis();
             }
-            ResourceLocation dimension = ResourceLocation.tryParse(object.get("dimension").getAsString());
+            JsonElement dimensionElement = object.get("dimension");
+            ResourceKey<Level> dimension = null;
+            if (dimensionElement != null) {
+                ResourceLocation dimensionLocation = ResourceLocation.tryParse(dimensionElement.getAsString());
+                if (dimensionLocation != null) {
+                    dimension = ResourceKey.create(Registries.DIMENSION, dimensionLocation);
+                }
+            }
+            if (dimension == null) {
+                dimension = ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld"));
+            }
+
             int x = object.get("x").getAsInt();
             int y = object.get("y").getAsInt();
             int z = object.get("z").getAsInt();

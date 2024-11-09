@@ -3,7 +3,6 @@ package de.maxhenkel.coordinatehud.screen;
 import de.maxhenkel.coordinatehud.CoordinateHUD;
 import de.maxhenkel.coordinatehud.Waypoint;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
@@ -54,8 +53,7 @@ public class WaypointScreen extends Screen {
         this.parent = parent;
         this.newWaypoint = waypoint == null;
         if (newWaypoint) {
-            minecraft = Minecraft.getInstance();
-            waypoint = Waypoint.create(minecraft.level.dimension().location(), minecraft.gameRenderer.getMainCamera().getBlockPosition());
+            waypoint = Waypoint.create();
         }
         this.waypoint = waypoint;
     }

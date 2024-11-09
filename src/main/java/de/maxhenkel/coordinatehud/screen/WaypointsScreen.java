@@ -193,9 +193,15 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                 guiGraphics.drawString(font, coords, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(coords) / 2, posY, 0xFFFFFFFF, true);
                 posY += font.lineHeight + 1;
 
-                int distanceInBlocks = (int) minecraft.gameRenderer.getMainCamera().getPosition().distanceTo(waypoint.getPos().getCenter());
-                Component distance = Component.translatable("message.coordinatehud.distance", NUMBER_FORMAT.format(distanceInBlocks));
-                guiGraphics.drawString(font, distance, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(distance) / 2, posY, 0xFFFFFFFF, true);
+                Component details;
+                ResourceLocation dimensionLocation = waypoint.getDimension().location();
+                if (minecraft.level == null || dimensionLocation.equals(minecraft.level.dimension().location())) {
+                    int distanceInBlocks = (int) minecraft.gameRenderer.getMainCamera().getPosition().distanceTo(waypoint.getPos().getCenter());
+                    details = Component.translatable("message.coordinatehud.distance", NUMBER_FORMAT.format(distanceInBlocks));
+                } else {
+                    details = waypoint.translateDimension();
+                }
+                guiGraphics.drawString(font, details, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(details) / 2, posY, 0xFFFFFFFF, true);
 
                 visible.setPosition(visibleStart, top + height / 2 - visible.getHeight() / 2);
                 visible.render(guiGraphics, mouseX, mouseY, delta);
