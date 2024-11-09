@@ -1,20 +1,18 @@
 package de.maxhenkel.coordinatehud.screen;
 
 import de.maxhenkel.coordinatehud.CoordinateHUD;
+import de.maxhenkel.coordinatehud.DimensionUtils;
 import de.maxhenkel.coordinatehud.Waypoint;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Checkbox;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
-import net.minecraft.client.gui.layouts.SpacerElement;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
@@ -26,6 +24,7 @@ public class WaypointScreen extends Screen {
     private static final Component WAYPOINT_NAME = Component.translatable("message.coordinatehud.edit_waypoint.waypoint_name").withStyle(ChatFormatting.GRAY);
     private static final Component COORDINATES = Component.translatable("message.coordinatehud.edit_waypoint.coordinates").withStyle(ChatFormatting.GRAY);
     private static final Component VISIBLE = Component.translatable("message.coordinatehud.edit_waypoint.visible").withStyle(ChatFormatting.GRAY);
+    private static final Component DIMENSION = Component.translatable("message.coordinatehud.edit_waypoint.dimension");
     private static final Component COLOR = Component.translatable("message.coordinatehud.edit_waypoint.color").withStyle(ChatFormatting.GRAY);
     private static final Component SAVE = Component.translatable("message.coordinatehud.edit_waypoint.save");
     private static final Component CANCEL = Component.translatable("message.coordinatehud.edit_waypoint.cancel");
@@ -40,9 +39,8 @@ public class WaypointScreen extends Screen {
     protected EditBox coordinateY;
     protected EditBox coordinateZ;
     protected Checkbox visible;
+    protected ResourceKey<Level> dimension;
     protected WaypointIconDisplay waypointColor;
-    @Nullable
-    protected ResourceLocation icon;
     protected Button saveButton;
 
     protected boolean newWaypoint;
@@ -84,18 +82,22 @@ public class WaypointScreen extends Screen {
         coordinateZ.setValue(String.valueOf(waypoint.getPos().getZ()));
         contentLayout.addChild(coordsLayout);
 
+        dimension = waypoint.getDimension();
+        CycleButton<ResourceKey<Level>> dimensionButton = CycleButton.builder(DimensionUtils::translateDimension)
+                .withValues(DimensionUtils.getAllDimensions())
+                .withInitialValue(dimension)
+                .create(0, 0, 200, 20, DIMENSION, (cycleButton, dim) -> dimension = dim);
+        contentLayout.addChild(dimensionButton);
+
         contentLayout.addChild(new StringWidget(COLOR, font));
         LinearLayout colorLayout = LinearLayout.horizontal().spacing(4);
         waypointColor = colorLayout.addChild(new WaypointIconDisplay(0, 0, 20, 20, waypoint.getColor()));
         colorLayout.addChild(new ColorPicker(0, 0, 176, 20, color -> {
             waypointColor.setColor(color);
-            icon = null;
         }));
         contentLayout.addChild(colorLayout);
 
         visible = contentLayout.addChild(Checkbox.builder(VISIBLE, font).selected(waypoint.isActive()).build());
-
-        contentLayout.addChild(new SpacerElement(200, 10));
 
         LinearLayout linearlayout = LinearLayout.horizontal().spacing(4);
         saveButton = linearlayout.addChild(Button.builder(SAVE, b -> {
@@ -139,6 +141,7 @@ public class WaypointScreen extends Screen {
             waypoint.setName(newName.trim());
         }
         waypoint.setPos(new BlockPos(parseCoordinate(coordinateX), parseCoordinate(coordinateY), parseCoordinate(coordinateZ)));
+        waypoint.setDimension(dimension);
         waypoint.setColor(waypointColor.getColor());
         waypoint.setActive(visible.selected());
         CoordinateHUD.WAYPOINT_STORE.addWaypoint(waypoint);

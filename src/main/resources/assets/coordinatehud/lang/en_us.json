@@ -14,6 +14,7 @@
   "message.coordinatehud.edit_waypoint.waypoint_name": "Waypoint name",
   "message.coordinatehud.edit_waypoint.coordinates": "Coordinates",
   "message.coordinatehud.edit_waypoint.visible": "Visible",
+  "message.coordinatehud.edit_waypoint.dimension": "Dimension",
   "message.coordinatehud.edit_waypoint.color": "Color",
   "message.coordinatehud.edit_waypoint.save": "Save",
   "message.coordinatehud.edit_waypoint.cancel": "Cancel",

@@ -5,7 +5,6 @@ import de.maxhenkel.coordinatehud.screen.ColorPicker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +39,7 @@ public class Waypoint {
     }
 
     public static Waypoint create() {
-        return new Waypoint(UUID.randomUUID(), "", System.currentTimeMillis(), getCurrentDimension(), Minecraft.getInstance().gameRenderer.getMainCamera().getBlockPosition(), randomColor(), true);
+        return new Waypoint(UUID.randomUUID(), "", System.currentTimeMillis(), DimensionUtils.getCurrentDimension(), Minecraft.getInstance().gameRenderer.getMainCamera().getBlockPosition(), randomColor(), true);
     }
 
     public UUID getId() {
@@ -107,24 +106,11 @@ public class Waypoint {
     }
 
     public boolean isCurrentDimension() {
-        return isSameDimension(getCurrentDimension());
-    }
-
-    public static ResourceKey<Level> getCurrentDimension() {
-        Minecraft mc = Minecraft.getInstance();
-        return mc.level == null ? ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld")) : mc.level.dimension();
+        return isSameDimension(DimensionUtils.getCurrentDimension());
     }
 
     public MutableComponent translateDimension() {
-        String[] split = dimension.location().getPath().split("_");
-        StringBuilder builder = new StringBuilder();
-        for (String s : split) {
-            if (s.isEmpty()) {
-                continue;
-            }
-            builder.append(s.substring(0, 1).toUpperCase()).append(s.substring(1)).append(" ");
-        }
-        return Component.literal(builder.toString());
+        return DimensionUtils.translateDimension(dimension);
     }
 
     public static int randomColor() {
