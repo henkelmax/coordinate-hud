@@ -20,6 +20,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
     private static final Component TITLE = Component.translatable("gui.coordinatehud.waypoints.title");
     private static final Component ORDER = Component.translatable("message.coordinatehud.order");
+    private static final Component DIMENSION_FILTER = Component.translatable("message.coordinatehud.dimension_filter");
     private static final Component BACK = Component.translatable("message.coordinatehud.back");
     private static final Component CREATE = Component.translatable("message.coordinatehud.new_waypoint");
     private static final Component EDIT = Component.translatable("message.coordinatehud.edit");
@@ -38,6 +39,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
     @Nullable
     protected final Screen parent;
     protected CycleButton<SortOrder> sortOrder;
+    protected CycleButton<DimensionFilter> dimensionFilter;
     protected WaypointList waypointList;
 
     public WaypointsScreen(@Nullable Screen parent) {
@@ -50,13 +52,22 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
     protected void init() {
         super.init();
 
+        dimensionFilter = addRenderableWidget(
+                CycleButton.builder(DimensionFilter::getName)
+                        .withValues(DimensionFilter.values())
+                        .withInitialValue(CoordinateHUD.CLIENT_CONFIG.dimensionFilter.get())
+                        .create(PADDING, PADDING, 100, 20, DIMENSION_FILTER, (cycleButton, value) -> {
+                            CoordinateHUD.CLIENT_CONFIG.dimensionFilter.set(value).save();
+                            waypointList.updateEntries();
+                        })
+        );
+
         sortOrder = addRenderableWidget(
                 CycleButton.builder(SortOrder::getName)
                         .withValues(SortOrder.values())
                         .withInitialValue(CoordinateHUD.CLIENT_CONFIG.waypointSortOrder.get())
                         .create(width - 100 - PADDING, PADDING, 100, 20, ORDER, (cycleButton, value) -> {
-                            CoordinateHUD.CLIENT_CONFIG.waypointSortOrder.set(value);
-                            CoordinateHUD.CLIENT_CONFIG.waypointSortOrder.save();
+                            CoordinateHUD.CLIENT_CONFIG.waypointSortOrder.set(value).save();
                             waypointList.updateEntries();
                         })
         );
@@ -125,7 +136,9 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
             List<Waypoint> waypointsList = sortOrder.getValue().sort(CoordinateHUD.WAYPOINT_STORE.getWaypoints());
             for (Waypoint waypoint : waypointsList) {
-                addEntry(new Entry(waypoint));
+                if (dimensionFilter.getValue().getPredicate().test(waypoint)) {
+                    addEntry(new Entry(waypoint));
+                }
             }
 
             clampScrollAmount();

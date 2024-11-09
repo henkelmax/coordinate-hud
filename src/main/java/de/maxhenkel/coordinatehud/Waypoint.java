@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.Random;
@@ -39,8 +40,7 @@ public class Waypoint {
     }
 
     public static Waypoint create() {
-        Minecraft mc = Minecraft.getInstance();
-        return new Waypoint(UUID.randomUUID(), "", System.currentTimeMillis(), mc.level == null ? ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld")) : mc.level.dimension(), mc.gameRenderer.getMainCamera().getBlockPosition(), randomColor(), true);
+        return new Waypoint(UUID.randomUUID(), "", System.currentTimeMillis(), getCurrentDimension(), Minecraft.getInstance().gameRenderer.getMainCamera().getBlockPosition(), randomColor(), true);
     }
 
     public UUID getId() {
@@ -97,6 +97,22 @@ public class Waypoint {
 
     public double distanceToCamera() {
         return Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().distanceTo(pos.getCenter());
+    }
+
+    public boolean isSameDimension(@Nullable ResourceKey<Level> dimension) {
+        if (dimension == null) {
+            return false;
+        }
+        return this.dimension.location().equals(dimension.location());
+    }
+
+    public boolean isCurrentDimension() {
+        return isSameDimension(getCurrentDimension());
+    }
+
+    public static ResourceKey<Level> getCurrentDimension() {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.level == null ? ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld")) : mc.level.dimension();
     }
 
     public MutableComponent translateDimension() {
