@@ -75,6 +75,9 @@ public class WaypointStore {
     }
 
     public void addWaypoint(Waypoint waypoint) {
+        if (waypoint.getName().isBlank()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
         waypoints.put(waypoint.getId(), waypoint);
         save();
     }
@@ -87,10 +90,5 @@ public class WaypointStore {
 
     public Waypoint removeWaypoint(Waypoint waypoint) {
         return removeWaypoint(waypoint.getId());
-    }
-
-    public void updateWaypoint(Waypoint waypoint) {
-        waypoints.put(waypoint.getId(), waypoint);
-        save();
     }
 }

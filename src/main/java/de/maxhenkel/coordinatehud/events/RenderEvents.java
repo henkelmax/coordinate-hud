@@ -62,12 +62,12 @@ public class RenderEvents {
         stack.mulPose(Axis.YP.rotationDegrees(180F - mainCamera.getYRot()));
         stack.mulPose(Axis.XP.rotationDegrees(-mainCamera.getXRot()));
 
-        int alpha = 128;
+        //TODO Split texture in colored and uncolored part
         VertexConsumer builderSeeThrough = context.consumers().getBuffer(RenderType.textSeeThrough(TEXTURE_LOCATION));
-        vertex(builderSeeThrough, stack, -0.5F, -0.5F, 0F, 0F, 1F, alpha);
-        vertex(builderSeeThrough, stack, 0.5F, -0.5F, 0F, 1F, 1F, alpha);
-        vertex(builderSeeThrough, stack, 0.5F, 0.5F, 0F, 1F, 0F, alpha);
-        vertex(builderSeeThrough, stack, -0.5F, 0.5F, 0F, 0F, 0F, alpha);
+        vertex(builderSeeThrough, stack, -0.5F, -0.5F, 0F, 0F, 1F, waypoint.getColor(), 0.5F);
+        vertex(builderSeeThrough, stack, 0.5F, -0.5F, 0F, 1F, 1F, waypoint.getColor(), 0.5F);
+        vertex(builderSeeThrough, stack, 0.5F, 0.5F, 0F, 1F, 0F, waypoint.getColor(), 0.5F);
+        vertex(builderSeeThrough, stack, -0.5F, 0.5F, 0F, 0F, 0F, waypoint.getColor(), 0.5F);
 
         stack.pushPose();
         stack.translate(0D, 1D, 0D);
@@ -124,18 +124,22 @@ public class RenderEvents {
         return dir.dot(waypointDir) > threshold;
     }
 
-    private static void vertex(VertexConsumer builder, PoseStack matrixStack, float x, float y, float z, float u, float v) {
-        vertex(builder, matrixStack, x, y, z, u, v, 255);
+    private static void vertex(VertexConsumer builder, PoseStack matrixStack, float x, float y, float z, float u, float v, int color, int alpha) {
+        vertex(builder, matrixStack, x, y, z, u, v, (color & 0xFFFFFF) | alpha << 24);
     }
 
-    private static void vertex(VertexConsumer builder, PoseStack matrixStack, float x, float y, float z, float u, float v, int alpha) {
+    private static void vertex(VertexConsumer builder, PoseStack matrixStack, float x, float y, float z, float u, float v, int color, float alpha) {
+        vertex(builder, matrixStack, x, y, z, u, v, color, (int) (alpha * 255F));
+    }
+
+    private static void vertex(VertexConsumer builder, PoseStack matrixStack, float x, float y, float z, float u, float v, int color) {
         PoseStack.Pose entry = matrixStack.last();
         builder.addVertex(entry.pose(), x, y, z)
-                .setColor(255, 255, 255, alpha)
+                .setColor(color)
                 .setUv(u, v)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(LightTexture.FULL_BRIGHT)
-                .setNormal( 0F, 0F, -1F);
+                .setNormal(0F, 0F, -1F);
     }
 
 

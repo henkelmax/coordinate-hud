@@ -1,14 +1,14 @@
 package de.maxhenkel.coordinatehud;
 
 import de.maxhenkel.configbuilder.ConfigBuilder;
-import de.maxhenkel.coordinatehud.command.WaypointCommand;
 import de.maxhenkel.coordinatehud.config.ClientConfig;
 import de.maxhenkel.coordinatehud.config.WaypointStore;
+import de.maxhenkel.coordinatehud.events.KeyEvents;
 import de.maxhenkel.coordinatehud.events.RenderEvents;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -32,7 +32,6 @@ public class CoordinateHUD implements ClientModInitializer {
         Path configFolder = FabricLoader.getInstance().getConfigDir().resolve(MODID);
         CLIENT_CONFIG = ConfigBuilder.builder(ClientConfig::new).path(configFolder.resolve("coordinatehud.properties")).build();
 
-        ClientCommandRegistrationCallback.EVENT.register(WaypointCommand::register);
         WorldRenderEvents.AFTER_ENTITIES.register(RenderEvents::render);
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
@@ -44,6 +43,8 @@ public class CoordinateHUD implements ClientModInitializer {
                 WAYPOINT_STORE = new WaypointStore(configFolder.resolve("%s_waypoints.json".formatted(cleanString(folderName))));
             }
         });
+        KeyEvents.init();
+        ClientTickEvents.END_CLIENT_TICK.register(KeyEvents::onTick);
     }
 
     private String cleanString(String str) {
