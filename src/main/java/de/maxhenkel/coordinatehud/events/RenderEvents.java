@@ -23,14 +23,21 @@ import java.util.List;
 
 public class RenderEvents {
 
+    private static final Minecraft mc = Minecraft.getInstance();
     private static final ResourceLocation TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint.png");
 
     public static void render(WorldRenderContext context) {
-        Minecraft minecraft = Minecraft.getInstance();
+        if (mc.options.hideGui) {
+            return;
+        }
+        if (CoordinateHUD.CLIENT_CONFIG.hideHud.get()) {
+            return;
+        }
+
         PoseStack stack = context.matrixStack();
 
-        Vec3 position = minecraft.gameRenderer.getMainCamera().getPosition();
-        Camera mainCamera = minecraft.gameRenderer.getMainCamera();
+        Vec3 position = mc.gameRenderer.getMainCamera().getPosition();
+        Camera mainCamera = mc.gameRenderer.getMainCamera();
 
         List<Waypoint> activeWaypoints = CoordinateHUD.WAYPOINT_STORE.getActiveWaypoints();
 
@@ -38,8 +45,8 @@ public class RenderEvents {
         stack.translate(-position.x, -position.y, -position.z);
 
         ResourceLocation currentDimension = null;
-        if (minecraft.level != null) {
-            currentDimension = minecraft.level.dimension().location();
+        if (mc.level != null) {
+            currentDimension = mc.level.dimension().location();
         }
 
         for (Waypoint waypoint : activeWaypoints) {
@@ -47,7 +54,7 @@ public class RenderEvents {
                 continue;
             }
             stack.pushPose();
-            renderWaypoint(context, minecraft, stack, mainCamera, waypoint);
+            renderWaypoint(context, mc, stack, mainCamera, waypoint);
             stack.popPose();
         }
         stack.popPose();

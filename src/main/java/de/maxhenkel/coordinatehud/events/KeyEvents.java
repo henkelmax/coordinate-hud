@@ -1,6 +1,7 @@
 package de.maxhenkel.coordinatehud.events;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import de.maxhenkel.coordinatehud.CoordinateHUD;
 import de.maxhenkel.coordinatehud.screen.WaypointScreen;
 import de.maxhenkel.coordinatehud.screen.WaypointsScreen;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -26,7 +27,7 @@ public class KeyEvents {
         }
 
         if (HIDE_HUD.consumeClick()) {
-            //TODO Add hide HUD option
+            CoordinateHUD.CLIENT_CONFIG.hideHud.set(!CoordinateHUD.CLIENT_CONFIG.hideHud.get()).save();
         }
         if (WAYPOINTS.consumeClick()) {
             mc.setScreen(new WaypointsScreen(null));
