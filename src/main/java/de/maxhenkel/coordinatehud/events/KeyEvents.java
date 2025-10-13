@@ -7,18 +7,21 @@ import de.maxhenkel.coordinatehud.screen.WaypointsScreen;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyEvents {
 
+    public static KeyMapping.Category CATEGORY_COORDINATE_HUD;
     public static KeyMapping HIDE_HUD;
     public static KeyMapping WAYPOINTS;
     public static KeyMapping CREATE_WAYPOINT;
 
     public static void init() {
-        HIDE_HUD = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.hide_hud", InputConstants.UNKNOWN.getValue(), "key.categories.coordinatehud"));
-        WAYPOINTS = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.waypoints", GLFW.GLFW_KEY_M, "key.categories.coordinatehud"));
-        CREATE_WAYPOINT = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.create_waypoint", InputConstants.UNKNOWN.getValue(), "key.categories.coordinatehud"));
+        CATEGORY_COORDINATE_HUD = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "coordinatehud"));
+        HIDE_HUD = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.hide_hud", InputConstants.UNKNOWN.getValue(), CATEGORY_COORDINATE_HUD));
+        WAYPOINTS = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.waypoints", GLFW.GLFW_KEY_M, CATEGORY_COORDINATE_HUD));
+        CREATE_WAYPOINT = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.create_waypoint", InputConstants.UNKNOWN.getValue(), CATEGORY_COORDINATE_HUD));
     }
 
     public static void onTick(Minecraft mc) {

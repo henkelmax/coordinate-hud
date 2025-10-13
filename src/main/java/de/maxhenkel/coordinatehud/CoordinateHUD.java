@@ -4,13 +4,11 @@ import de.maxhenkel.configbuilder.ConfigBuilder;
 import de.maxhenkel.coordinatehud.config.ClientConfig;
 import de.maxhenkel.coordinatehud.config.WaypointStore;
 import de.maxhenkel.coordinatehud.events.KeyEvents;
-import de.maxhenkel.coordinatehud.events.RenderEvents;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.world.level.storage.LevelResource;
@@ -32,7 +30,8 @@ public class CoordinateHUD implements ClientModInitializer {
         Path configFolder = FabricLoader.getInstance().getConfigDir().resolve(MODID);
         CLIENT_CONFIG = ConfigBuilder.builder(ClientConfig::new).path(configFolder.resolve("coordinatehud.properties")).build();
 
-        WorldRenderEvents.AFTER_ENTITIES.register(RenderEvents::render);
+        //TODO Implement this once Fabric API has the new WorldRenderEvents
+        //WorldRenderEvents.AFTER_ENTITIES.register(RenderEvents::render);
 
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             ServerData serverData = handler.getServerData();

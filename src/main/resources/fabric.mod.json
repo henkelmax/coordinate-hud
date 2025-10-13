@@ -18,6 +18,9 @@
       "de.maxhenkel.coordinatehud.integration.ModMenuIntegration"
     ]
   },
+  "mixins": [
+    "coordinatehud.mixins.json"
+  ],
   "depends": {
     "fabricloader": "${fabric_loader_dependency}",
     "minecraft": "${minecraft_dependency}"

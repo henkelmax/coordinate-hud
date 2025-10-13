@@ -5,13 +5,14 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import de.maxhenkel.coordinatehud.CoordinateHUD;
 import de.maxhenkel.coordinatehud.Waypoint;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -27,15 +28,13 @@ public class RenderEvents {
     private static final ResourceLocation COLOR_LOCATION = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint_color.png");
     private static final ResourceLocation OVERLAY_LOCATION = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint_overlay.png");
 
-    public static void render(WorldRenderContext context) {
+    public static void render(PoseStack stack, LevelRenderState levelRenderState, SubmitNodeStorage submitNodeStorage) {
         if (mc.options.hideGui) {
             return;
         }
         if (CoordinateHUD.CLIENT_CONFIG.hideHud.get()) {
             return;
         }
-
-        PoseStack stack = context.matrixStack();
 
         Vec3 position = mc.gameRenderer.getMainCamera().getPosition();
         Camera mainCamera = mc.gameRenderer.getMainCamera();
@@ -55,13 +54,13 @@ public class RenderEvents {
                 continue;
             }
             stack.pushPose();
-            renderWaypoint(context, mc, stack, mainCamera, waypoint);
+            renderWaypoint(submitNodeStorage, mc, stack, mainCamera, waypoint);
             stack.popPose();
         }
         stack.popPose();
     }
 
-    public static void renderWaypoint(WorldRenderContext context, Minecraft minecraft, PoseStack stack, Camera mainCamera, Waypoint waypoint) {
+    public static void renderWaypoint(SubmitNodeStorage storage, Minecraft minecraft, PoseStack stack, Camera mainCamera, Waypoint waypoint) {
         Font font = minecraft.font;
         Vec3 waypointPos = getFakePos(mainCamera, waypoint.getPos().getCenter());
         stack.translate(waypointPos.x, waypointPos.y, waypointPos.z);
@@ -70,17 +69,19 @@ public class RenderEvents {
         stack.mulPose(Axis.YP.rotationDegrees(180F - mainCamera.getYRot()));
         stack.mulPose(Axis.XP.rotationDegrees(-mainCamera.getXRot()));
 
-        VertexConsumer color = context.consumers().getBuffer(RenderType.textSeeThrough(COLOR_LOCATION));
-        vertex(color, stack, -0.5F, -0.5F, 0F, 0F, 1F, waypoint.getColor(), 0.5F);
-        vertex(color, stack, 0.5F, -0.5F, 0F, 1F, 1F, waypoint.getColor(), 0.5F);
-        vertex(color, stack, 0.5F, 0.5F, 0F, 1F, 0F, waypoint.getColor(), 0.5F);
-        vertex(color, stack, -0.5F, 0.5F, 0F, 0F, 0F, waypoint.getColor(), 0.5F);
+        storage.submitCustomGeometry(stack, RenderType.textSeeThrough(COLOR_LOCATION), (pose, vertexConsumer) -> {
+            vertex(vertexConsumer, pose, -0.5F, -0.5F, 0F, 0F, 1F, waypoint.getColor(), 0.5F);
+            vertex(vertexConsumer, pose, 0.5F, -0.5F, 0F, 1F, 1F, waypoint.getColor(), 0.5F);
+            vertex(vertexConsumer, pose, 0.5F, 0.5F, 0F, 1F, 0F, waypoint.getColor(), 0.5F);
+            vertex(vertexConsumer, pose, -0.5F, 0.5F, 0F, 0F, 0F, waypoint.getColor(), 0.5F);
+        });
 
-        VertexConsumer overlay = context.consumers().getBuffer(RenderType.textSeeThrough(OVERLAY_LOCATION));
-        vertex(overlay, stack, -0.5F, -0.5F, 0F, 0F, 1F, 0xFFFFFF, 0.5F);
-        vertex(overlay, stack, 0.5F, -0.5F, 0F, 1F, 1F, 0xFFFFFF, 0.5F);
-        vertex(overlay, stack, 0.5F, 0.5F, 0F, 1F, 0F, 0xFFFFFF, 0.5F);
-        vertex(overlay, stack, -0.5F, 0.5F, 0F, 0F, 0F, 0xFFFFFF, 0.5F);
+        storage.submitCustomGeometry(stack, RenderType.textSeeThrough(OVERLAY_LOCATION), (pose, vertexConsumer) -> {
+            vertex(vertexConsumer, pose, -0.5F, -0.5F, 0F, 0F, 1F, 0xFFFFFF, 0.5F);
+            vertex(vertexConsumer, pose, 0.5F, -0.5F, 0F, 1F, 1F, 0xFFFFFF, 0.5F);
+            vertex(vertexConsumer, pose, 0.5F, 0.5F, 0F, 1F, 0F, 0xFFFFFF, 0.5F);
+            vertex(vertexConsumer, pose, -0.5F, 0.5F, 0F, 0F, 0F, 0xFFFFFF, 0.5F);
+        });
 
         stack.pushPose();
         stack.translate(0D, 1D, 0D);
@@ -104,8 +105,8 @@ public class RenderEvents {
             }
             name.withStyle(ChatFormatting.WHITE);
 
-            font.drawInBatch(name, offsetX, offsetY, 0, false, stack.last().pose(), context.consumers(), Font.DisplayMode.SEE_THROUGH, 255, LightTexture.FULL_BRIGHT);
-            font.drawInBatch(name, offsetX, offsetY, 0, false, stack.last().pose(), context.consumers(), Font.DisplayMode.NORMAL, 255, LightTexture.FULL_BRIGHT);
+            storage.submitText(stack, offsetX, offsetY, name.getVisualOrderText(), false, Font.DisplayMode.SEE_THROUGH, LightTexture.FULL_BRIGHT, 0xFFFFFFFF, 0x00000000, 0x00000000);
+            storage.submitText(stack, offsetX, offsetY, name.getVisualOrderText(), false, Font.DisplayMode.NORMAL, LightTexture.FULL_BRIGHT, 0xFFFFFFFF, 0x00000000, 0x00000000);
         }
 
         stack.popPose();
@@ -137,23 +138,21 @@ public class RenderEvents {
         return dir.dot(waypointDir) > threshold;
     }
 
-    private static void vertex(VertexConsumer builder, PoseStack matrixStack, float x, float y, float z, float u, float v, int color, int alpha) {
-        vertex(builder, matrixStack, x, y, z, u, v, (color & 0xFFFFFF) | alpha << 24);
+    private static void vertex(VertexConsumer builder, PoseStack.Pose pose, float x, float y, float z, float u, float v, int color, int alpha) {
+        vertex(builder, pose, x, y, z, u, v, (color & 0xFFFFFF) | alpha << 24);
     }
 
-    private static void vertex(VertexConsumer builder, PoseStack matrixStack, float x, float y, float z, float u, float v, int color, float alpha) {
-        vertex(builder, matrixStack, x, y, z, u, v, color, (int) (alpha * 255F));
+    private static void vertex(VertexConsumer builder, PoseStack.Pose pose, float x, float y, float z, float u, float v, int color, float alpha) {
+        vertex(builder, pose, x, y, z, u, v, color, (int) (alpha * 255F));
     }
 
-    private static void vertex(VertexConsumer builder, PoseStack matrixStack, float x, float y, float z, float u, float v, int color) {
-        PoseStack.Pose entry = matrixStack.last();
-        builder.addVertex(entry.pose(), x, y, z)
+    private static void vertex(VertexConsumer builder, PoseStack.Pose pose, float x, float y, float z, float u, float v, int color) {
+        builder.addVertex(pose, x, y, z)
                 .setColor(color)
                 .setUv(u, v)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(LightTexture.FULL_BRIGHT)
                 .setNormal(0F, 0F, -1F);
     }
-
 
 }

@@ -4,8 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FastColor;
 
 import java.awt.*;
 import java.util.function.Consumer;
@@ -33,29 +33,29 @@ public class ColorPicker extends AbstractWidget {
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        return updateColor(mouseX, mouseY, button);
+    public boolean mouseDragged(MouseButtonEvent event, double d, double e) {
+        return updateColor(event);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        boolean success = updateColor(mouseX, mouseY, button);
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        boolean success = updateColor(event);
         if (success) {
             playDownSound(Minecraft.getInstance().getSoundManager());
         }
         return success;
     }
 
-    private boolean updateColor(double mouseX, double mouseY, int button) {
-        if (!isValidClickButton(button)) {
+    private boolean updateColor(MouseButtonEvent event) {
+        if (!isValidClickButton(event.buttonInfo())) {
             return false;
         }
 
-        if (!isMouseOver(mouseX, mouseY)) {
+        if (!isMouseOver(event.x(), event.y())) {
             return false;
         }
 
-        double value = Math.max(Math.min((mouseX - getX() + 1) / (getWidth() - 2), 1D), 0D);
+        double value = Math.max(Math.min((event.x() - getX() + 1) / (getWidth() - 2), 1D), 0D);
 
         onColorChange.accept(getColor((float) value));
         return true;
@@ -68,6 +68,6 @@ public class ColorPicker extends AbstractWidget {
 
     public static int getColor(float value) {
         Color hsbColor = Color.getHSBColor(value, 1F, 1F);
-        return FastColor.ARGB32.color(hsbColor.getRed(), hsbColor.getGreen(), hsbColor.getBlue());
+        return hsbColor.getAlpha() << 24 | hsbColor.getRed() << 16 | hsbColor.getGreen() << 8 | hsbColor.getBlue();
     }
 }
