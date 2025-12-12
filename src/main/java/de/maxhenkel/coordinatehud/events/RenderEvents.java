@@ -10,13 +10,13 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
@@ -25,8 +25,8 @@ import java.util.List;
 public class RenderEvents {
 
     private static final Minecraft mc = Minecraft.getInstance();
-    private static final ResourceLocation COLOR_LOCATION = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint_color.png");
-    private static final ResourceLocation OVERLAY_LOCATION = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint_overlay.png");
+    private static final Identifier COLOR_LOCATION = Identifier.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint_color.png");
+    private static final Identifier OVERLAY_LOCATION = Identifier.fromNamespaceAndPath(CoordinateHUD.MODID, "textures/icons/waypoint_overlay.png");
 
     public static void render(PoseStack stack, LevelRenderState levelRenderState, SubmitNodeStorage submitNodeStorage) {
         if (mc.options.hideGui) {
@@ -36,7 +36,7 @@ public class RenderEvents {
             return;
         }
 
-        Vec3 position = mc.gameRenderer.getMainCamera().getPosition();
+        Vec3 position = mc.gameRenderer.getMainCamera().position();
         Camera mainCamera = mc.gameRenderer.getMainCamera();
 
         List<Waypoint> activeWaypoints = CoordinateHUD.WAYPOINT_STORE.getActiveWaypoints();
@@ -44,13 +44,13 @@ public class RenderEvents {
         stack.pushPose();
         stack.translate(-position.x, -position.y, -position.z);
 
-        ResourceLocation currentDimension = null;
+        Identifier currentDimension = null;
         if (mc.level != null) {
-            currentDimension = mc.level.dimension().location();
+            currentDimension = mc.level.dimension().identifier();
         }
 
         for (Waypoint waypoint : activeWaypoints) {
-            if (!waypoint.getDimension().location().equals(currentDimension)) {
+            if (!waypoint.getDimension().identifier().equals(currentDimension)) {
                 continue;
             }
             stack.pushPose();
@@ -66,17 +66,17 @@ public class RenderEvents {
         stack.translate(waypointPos.x, waypointPos.y, waypointPos.z);
         stack.pushPose();
 
-        stack.mulPose(Axis.YP.rotationDegrees(180F - mainCamera.getYRot()));
-        stack.mulPose(Axis.XP.rotationDegrees(-mainCamera.getXRot()));
+        stack.mulPose(Axis.YP.rotationDegrees(180F - mainCamera.yRot()));
+        stack.mulPose(Axis.XP.rotationDegrees(-mainCamera.xRot()));
 
-        storage.submitCustomGeometry(stack, RenderType.textSeeThrough(COLOR_LOCATION), (pose, vertexConsumer) -> {
+        storage.submitCustomGeometry(stack, RenderTypes.textSeeThrough(COLOR_LOCATION), (pose, vertexConsumer) -> {
             vertex(vertexConsumer, pose, -0.5F, -0.5F, 0F, 0F, 1F, waypoint.getColor(), 0.5F);
             vertex(vertexConsumer, pose, 0.5F, -0.5F, 0F, 1F, 1F, waypoint.getColor(), 0.5F);
             vertex(vertexConsumer, pose, 0.5F, 0.5F, 0F, 1F, 0F, waypoint.getColor(), 0.5F);
             vertex(vertexConsumer, pose, -0.5F, 0.5F, 0F, 0F, 0F, waypoint.getColor(), 0.5F);
         });
 
-        storage.submitCustomGeometry(stack, RenderType.textSeeThrough(OVERLAY_LOCATION), (pose, vertexConsumer) -> {
+        storage.submitCustomGeometry(stack, RenderTypes.textSeeThrough(OVERLAY_LOCATION), (pose, vertexConsumer) -> {
             vertex(vertexConsumer, pose, -0.5F, -0.5F, 0F, 0F, 1F, 0xFFFFFF, 0.5F);
             vertex(vertexConsumer, pose, 0.5F, -0.5F, 0F, 1F, 1F, 0xFFFFFF, 0.5F);
             vertex(vertexConsumer, pose, 0.5F, 0.5F, 0F, 1F, 0F, 0xFFFFFF, 0.5F);
@@ -99,7 +99,7 @@ public class RenderEvents {
         if (isLookingAtWaypoint(mainCamera, waypointPos)) {
             MutableComponent name;
             if (CoordinateHUD.CLIENT_CONFIG.showWaypointDistance.get()) {
-                name = Component.translatable("message.coordinatehud.waypoint_name_distance", waypoint.getName(), (int) mainCamera.getPosition().distanceTo(waypoint.getPos().getCenter()));
+                name = Component.translatable("message.coordinatehud.waypoint_name_distance", waypoint.getName(), (int) mainCamera.position().distanceTo(waypoint.getPos().getCenter()));
             } else {
                 name = Component.translatable("message.coordinatehud.waypoint_name", waypoint.getName());
             }
@@ -115,7 +115,7 @@ public class RenderEvents {
 
     private static Vec3 getFakePos(Camera camera, Vec3 pos) {
         Integer waypointDistance = CoordinateHUD.CLIENT_CONFIG.waypointScaleDistance.get();
-        Vec3 cameraPos = camera.getPosition();
+        Vec3 cameraPos = camera.position();
 
         if (cameraPos.distanceTo(pos) < waypointDistance) {
             return pos;
@@ -127,8 +127,8 @@ public class RenderEvents {
 
     private static boolean isLookingAtWaypoint(Camera camera, Vec3 waypointPos) {
         Integer waypointDistance = CoordinateHUD.CLIENT_CONFIG.waypointScaleDistance.get();
-        Vec3 cameraPos = camera.getPosition();
-        Vec3 dir = new Vec3(camera.getLookVector().x, camera.getLookVector().y, camera.getLookVector().z);
+        Vec3 cameraPos = camera.position();
+        Vec3 dir = new Vec3(camera.forwardVector().x(), camera.forwardVector().y(), camera.forwardVector().z());
         Vec3 waypointDir = waypointPos.subtract(cameraPos).normalize();
         double threshold = 0.999D;
         double distance = cameraPos.distanceTo(waypointPos);

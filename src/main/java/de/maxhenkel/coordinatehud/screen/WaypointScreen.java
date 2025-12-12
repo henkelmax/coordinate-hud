@@ -83,9 +83,8 @@ public class WaypointScreen extends Screen {
         contentLayout.addChild(coordsLayout);
 
         dimension = waypoint.getDimension();
-        CycleButton<ResourceKey<Level>> dimensionButton = CycleButton.builder(DimensionUtils::translateDimension)
+        CycleButton<ResourceKey<Level>> dimensionButton = CycleButton.builder(DimensionUtils::translateDimension, dimension)
                 .withValues(DimensionUtils.getAllDimensions())
-                .withInitialValue(dimension)
                 .create(0, 0, 200, 20, DIMENSION, (cycleButton, dim) -> dimension = dim);
         contentLayout.addChild(dimensionButton);
 

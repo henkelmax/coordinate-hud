@@ -2,7 +2,6 @@ package de.maxhenkel.coordinatehud.screen;
 
 import de.maxhenkel.coordinatehud.CoordinateHUD;
 import de.maxhenkel.coordinatehud.Waypoint;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
@@ -11,7 +10,7 @@ import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nullable;
 import java.text.NumberFormat;
@@ -26,8 +25,8 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
     private static final Component CREATE = Component.translatable("message.coordinatehud.new_waypoint");
     private static final Component EDIT = Component.translatable("message.coordinatehud.edit");
     private static final Component DELETE = Component.translatable("message.coordinatehud.delete");
-    private static final ResourceLocation EDIT_ICON = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "icon/edit");
-    private static final ResourceLocation DELETE_ICON = ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "icon/delete");
+    private static final Identifier EDIT_ICON = Identifier.fromNamespaceAndPath(CoordinateHUD.MODID, "icon/edit");
+    private static final Identifier DELETE_ICON = Identifier.fromNamespaceAndPath(CoordinateHUD.MODID, "icon/delete");
     private static final int HEADER_SIZE = 30;
     private static final int FOOTER_SIZE = 50;
     private static final int CELL_HEIGHT = 40;
@@ -45,7 +44,6 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
 
     public WaypointsScreen(@Nullable Screen parent) {
         super(TITLE);
-        this.minecraft = Minecraft.getInstance();
         this.parent = parent;
     }
 
@@ -54,9 +52,8 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
         super.init();
 
         dimensionFilter = addRenderableWidget(
-                CycleButton.builder(DimensionFilter::getName)
+                CycleButton.builder(DimensionFilter::getName, CoordinateHUD.CLIENT_CONFIG.dimensionFilter.get())
                         .withValues(DimensionFilter.values())
-                        .withInitialValue(CoordinateHUD.CLIENT_CONFIG.dimensionFilter.get())
                         .create(PADDING, PADDING, 100, 20, DIMENSION_FILTER, (cycleButton, value) -> {
                             CoordinateHUD.CLIENT_CONFIG.dimensionFilter.set(value).save();
                             waypointList.updateEntries();
@@ -64,9 +61,8 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
         );
 
         sortOrder = addRenderableWidget(
-                CycleButton.builder(SortOrder::getName)
+                CycleButton.builder(SortOrder::getName, CoordinateHUD.CLIENT_CONFIG.waypointSortOrder.get())
                         .withValues(SortOrder.values())
-                        .withInitialValue(CoordinateHUD.CLIENT_CONFIG.waypointSortOrder.get())
                         .create(width - 100 - PADDING, PADDING, 100, 20, ORDER, (cycleButton, value) -> {
                             CoordinateHUD.CLIENT_CONFIG.waypointSortOrder.set(value).save();
                             waypointList.updateEntries();
@@ -203,9 +199,9 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                 posY += font.lineHeight + 1;
 
                 Component details;
-                ResourceLocation dimensionLocation = waypoint.getDimension().location();
-                if (minecraft.level == null || dimensionLocation.equals(minecraft.level.dimension().location())) {
-                    int distanceInBlocks = (int) minecraft.gameRenderer.getMainCamera().getPosition().distanceTo(waypoint.getPos().getCenter());
+                Identifier dimensionLocation = waypoint.getDimension().identifier();
+                if (minecraft.level == null || dimensionLocation.equals(minecraft.level.dimension().identifier())) {
+                    int distanceInBlocks = (int) minecraft.gameRenderer.getMainCamera().position().distanceTo(waypoint.getPos().getCenter());
                     details = Component.translatable("message.coordinatehud.distance", NUMBER_FORMAT.format(distanceInBlocks));
                 } else {
                     details = waypoint.translateDimension();

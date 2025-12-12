@@ -7,7 +7,7 @@ import de.maxhenkel.coordinatehud.screen.WaypointsScreen;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyEvents {
@@ -18,7 +18,7 @@ public class KeyEvents {
     public static KeyMapping CREATE_WAYPOINT;
 
     public static void init() {
-        CATEGORY_COORDINATE_HUD = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath(CoordinateHUD.MODID, "coordinatehud"));
+        CATEGORY_COORDINATE_HUD = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(CoordinateHUD.MODID, "coordinatehud"));
         HIDE_HUD = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.hide_hud", InputConstants.UNKNOWN.getValue(), CATEGORY_COORDINATE_HUD));
         WAYPOINTS = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.waypoints", GLFW.GLFW_KEY_M, CATEGORY_COORDINATE_HUD));
         CREATE_WAYPOINT = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.create_waypoint", InputConstants.UNKNOWN.getValue(), CATEGORY_COORDINATE_HUD));

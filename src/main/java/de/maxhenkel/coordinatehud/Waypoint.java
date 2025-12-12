@@ -7,7 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -39,7 +39,7 @@ public class Waypoint {
     }
 
     public static Waypoint create() {
-        return new Waypoint(UUID.randomUUID(), "", System.currentTimeMillis(), DimensionUtils.getCurrentDimension(), Minecraft.getInstance().gameRenderer.getMainCamera().getBlockPosition(), randomColor(), true);
+        return new Waypoint(UUID.randomUUID(), "", System.currentTimeMillis(), DimensionUtils.getCurrentDimension(), Minecraft.getInstance().gameRenderer.getMainCamera().blockPosition(), randomColor(), true);
     }
 
     public UUID getId() {
@@ -95,14 +95,14 @@ public class Waypoint {
     }
 
     public double distanceToCamera() {
-        return Minecraft.getInstance().gameRenderer.getMainCamera().getPosition().distanceTo(pos.getCenter());
+        return Minecraft.getInstance().gameRenderer.getMainCamera().position().distanceTo(pos.getCenter());
     }
 
     public boolean isSameDimension(@Nullable ResourceKey<Level> dimension) {
         if (dimension == null) {
             return false;
         }
-        return this.dimension.location().equals(dimension.location());
+        return this.dimension.identifier().equals(dimension.identifier());
     }
 
     public boolean isCurrentDimension() {
@@ -139,7 +139,7 @@ public class Waypoint {
             object.addProperty("id", src.getId().toString());
             object.addProperty("name", src.getName());
             object.addProperty("creationTime", src.getCreationTime());
-            object.addProperty("dimension", src.getDimension().location().toString());
+            object.addProperty("dimension", src.getDimension().identifier().toString());
             object.addProperty("x", src.getPos().getX());
             object.addProperty("y", src.getPos().getY());
             object.addProperty("z", src.getPos().getZ());
@@ -165,13 +165,13 @@ public class Waypoint {
             JsonElement dimensionElement = object.get("dimension");
             ResourceKey<Level> dimension = null;
             if (dimensionElement != null) {
-                ResourceLocation dimensionLocation = ResourceLocation.tryParse(dimensionElement.getAsString());
+                Identifier dimensionLocation = Identifier.tryParse(dimensionElement.getAsString());
                 if (dimensionLocation != null) {
                     dimension = ResourceKey.create(Registries.DIMENSION, dimensionLocation);
                 }
             }
             if (dimension == null) {
-                dimension = ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld"));
+                dimension = ResourceKey.create(Registries.DIMENSION, Identifier.withDefaultNamespace("overworld"));
             }
 
             int x = object.get("x").getAsInt();
