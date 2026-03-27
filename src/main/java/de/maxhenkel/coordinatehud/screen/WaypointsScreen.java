@@ -2,7 +2,7 @@ package de.maxhenkel.coordinatehud.screen;
 
 import de.maxhenkel.coordinatehud.CoordinateHUD;
 import de.maxhenkel.coordinatehud.Waypoint;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.CycleButton;
@@ -86,9 +86,9 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int x, int y, float delta) {
-        super.render(guiGraphics, x, y, delta);
-        guiGraphics.drawString(font, TITLE, width / 2 - font.width(TITLE) / 2, HEADER_SIZE / 2 - font.lineHeight / 2, 0xFFFFFF, true);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int x, int y, float delta) {
+        super.extractRenderState(guiGraphics, x, y, delta);
+        guiGraphics.text(font, TITLE, width / 2 - font.width(TITLE) / 2, HEADER_SIZE / 2 - font.lineHeight / 2, 0xFFFFFF, true);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
             }
 
             @Override
-            public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovered, float delta) {
+            public void extractContent(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean hovered, float delta) {
                 guiGraphics.fill(getContentX() + PADDING, getContentY() + getContentHeight() / 2 - COLOR_SIZE / 2, getContentX() + PADDING + COLOR_SIZE, getContentY() + getContentHeight() / 2 + COLOR_SIZE / 2, 0xFFFFFFFF);
                 guiGraphics.fill(getContentX() + PADDING + 1, getContentY() + getContentHeight() / 2 - COLOR_SIZE / 2 + 1, getContentX() + PADDING + COLOR_SIZE - 1, getContentY() + getContentHeight() / 2 + COLOR_SIZE / 2 - 1, waypoint.getColor());
 
@@ -191,11 +191,11 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                 int visibleStart = getContentX() + getContentWidth() - 17 - 20 * 2 - SPACING * 2 - PADDING;
                 int textSpace = colorEnd - visibleStart;
 
-                guiGraphics.drawString(font, waypoint.getName(), visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(waypoint.getName()) / 2, posY, 0xFFFFFFFF, true);
+                guiGraphics.text(font, waypoint.getName(), visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(waypoint.getName()) / 2, posY, 0xFFFFFFFF, true);
                 posY += font.lineHeight + 1;
 
                 Component coords = Component.translatable("message.coordinatehud.coordinates", waypoint.getPos().getX(), waypoint.getPos().getY(), waypoint.getPos().getZ());
-                guiGraphics.drawString(font, coords, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(coords) / 2, posY, 0xFFFFFFFF, true);
+                guiGraphics.text(font, coords, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(coords) / 2, posY, 0xFFFFFFFF, true);
                 posY += font.lineHeight + 1;
 
                 Component details;
@@ -206,16 +206,16 @@ public class WaypointsScreen extends Screen implements UpdatableScreen {
                 } else {
                     details = waypoint.translateDimension();
                 }
-                guiGraphics.drawString(font, details, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(details) / 2, posY, 0xFFFFFFFF, true);
+                guiGraphics.text(font, details, visibleStart + textSpace / 2 - WaypointsScreen.this.font.width(details) / 2, posY, 0xFFFFFFFF, true);
 
                 visible.setPosition(visibleStart, getContentY() + getContentHeight() / 2 - visible.getHeight() / 2);
-                visible.render(guiGraphics, mouseX, mouseY, delta);
+                visible.extractRenderState(guiGraphics, mouseX, mouseY, delta);
 
                 edit.setPosition(getContentX() + getContentWidth() - 20 * 2 - SPACING - PADDING, getContentY() + getContentHeight() / 2 - 10);
-                edit.render(guiGraphics, mouseX, mouseY, delta);
+                edit.extractRenderState(guiGraphics, mouseX, mouseY, delta);
 
                 delete.setPosition(getContentX() + getContentWidth() - 20 - PADDING, getContentY() + getContentHeight() / 2 - 10);
-                delete.render(guiGraphics, mouseX, mouseY, delta);
+                delete.extractRenderState(guiGraphics, mouseX, mouseY, delta);
             }
         }
 

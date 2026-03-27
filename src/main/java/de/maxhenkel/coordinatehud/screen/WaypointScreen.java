@@ -4,7 +4,7 @@ import de.maxhenkel.coordinatehud.CoordinateHUD;
 import de.maxhenkel.coordinatehud.DimensionUtils;
 import de.maxhenkel.coordinatehud.Waypoint;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.FrameLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
@@ -29,7 +29,7 @@ public class WaypointScreen extends Screen {
     private static final Component SAVE = Component.translatable("message.coordinatehud.edit_waypoint.save");
     private static final Component CANCEL = Component.translatable("message.coordinatehud.edit_waypoint.cancel");
 
-    private static final String COORDINATE_REGEX = "-?[0-9]{0,8}";
+    private static final String COORDINATE_REGEX = "^-?[0-9]{1,8}$";
 
     @Nullable
     protected Screen parent;
@@ -66,19 +66,26 @@ public class WaypointScreen extends Screen {
         waypointName.setValue(waypoint.getName());
         waypointName.setMaxLength(Waypoint.MAX_WAYPOINT_NAME_LENGTH);
 
+        EditBox.TextFormatter textFormatter = (text, offset) -> {
+            if (!text.matches(COORDINATE_REGEX)) {
+                return Component.literal(text).withStyle(ChatFormatting.RED).getVisualOrderText();
+            }
+            return Component.literal(text).getVisualOrderText();
+        };
+
         contentLayout.addChild(new StringWidget(COORDINATES, font));
         LinearLayout coordsLayout = LinearLayout.horizontal().spacing(4);
         coordinateX = coordsLayout.addChild(new EditBox(font, 64, 20, COORDINATES));
         coordinateY = coordsLayout.addChild(new EditBox(font, 64, 20, COORDINATES));
         coordinateZ = coordsLayout.addChild(new EditBox(font, 64, 20, COORDINATES));
         coordinateX.setMaxLength(9);
-        coordinateX.setFilter(s -> s.isEmpty() || s.matches(COORDINATE_REGEX));
+        coordinateX.addFormatter(textFormatter);
         coordinateX.setValue(String.valueOf(waypoint.getPos().getX()));
         coordinateY.setMaxLength(9);
-        coordinateY.setFilter(s -> s.isEmpty() || s.matches(COORDINATE_REGEX));
+        coordinateY.addFormatter(textFormatter);
         coordinateY.setValue(String.valueOf(waypoint.getPos().getY()));
         coordinateZ.setMaxLength(9);
-        coordinateZ.setFilter(s -> s.isEmpty() || s.matches(COORDINATE_REGEX));
+        coordinateZ.addFormatter(textFormatter);
         coordinateZ.setValue(String.valueOf(waypoint.getPos().getZ()));
         contentLayout.addChild(coordsLayout);
 
@@ -114,15 +121,30 @@ public class WaypointScreen extends Screen {
     @Override
     public void tick() {
         super.tick();
-        if (saveButton != null) {
-            saveButton.active = !waypointName.getValue().isBlank();
+        if (saveButton == null) {
+            return;
         }
+        if (waypointName.getValue().isBlank()) {
+            saveButton.active = false;
+            return;
+        }
+        if (!coordinateX.getValue().matches(COORDINATE_REGEX)) {
+            saveButton.active = false;
+            return;
+        }
+        if (!coordinateY.getValue().matches(COORDINATE_REGEX)) {
+            saveButton.active = false;
+        }
+        if (!coordinateZ.getValue().matches(COORDINATE_REGEX)) {
+            saveButton.active = false;
+        }
+        saveButton.active = true;
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(font, newWaypoint ? CREATE_WAYPOINT : EDIT_WAYPOINT, width / 2, 15, 0xFFFFFFFF);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
+        guiGraphics.centeredText(font, newWaypoint ? CREATE_WAYPOINT : EDIT_WAYPOINT, width / 2, 15, 0xFFFFFFFF);
     }
 
     @Override

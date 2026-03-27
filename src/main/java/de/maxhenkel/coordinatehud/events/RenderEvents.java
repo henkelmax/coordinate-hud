@@ -9,14 +9,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
@@ -105,8 +105,8 @@ public class RenderEvents {
             }
             name.withStyle(ChatFormatting.WHITE);
 
-            storage.submitText(stack, offsetX, offsetY, name.getVisualOrderText(), false, Font.DisplayMode.SEE_THROUGH, LightTexture.FULL_BRIGHT, 0xFFFFFFFF, 0x00000000, 0x00000000);
-            storage.submitText(stack, offsetX, offsetY, name.getVisualOrderText(), false, Font.DisplayMode.NORMAL, LightTexture.FULL_BRIGHT, 0xFFFFFFFF, 0x00000000, 0x00000000);
+            storage.submitText(stack, offsetX, offsetY, name.getVisualOrderText(), false, Font.DisplayMode.SEE_THROUGH, LightCoordsUtil.FULL_BRIGHT, 0xFFFFFFFF, 0x00000000, 0x00000000);
+            storage.submitText(stack, offsetX, offsetY, name.getVisualOrderText(), false, Font.DisplayMode.NORMAL, LightCoordsUtil.FULL_BRIGHT, 0xFFFFFFFF, 0x00000000, 0x00000000);
         }
 
         stack.popPose();
@@ -151,7 +151,7 @@ public class RenderEvents {
                 .setColor(color)
                 .setUv(u, v)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(LightTexture.FULL_BRIGHT)
+                .setLight(LightCoordsUtil.FULL_BRIGHT)
                 .setNormal(0F, 0F, -1F);
     }
 

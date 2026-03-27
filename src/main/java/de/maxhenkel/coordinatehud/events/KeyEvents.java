@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import de.maxhenkel.coordinatehud.CoordinateHUD;
 import de.maxhenkel.coordinatehud.screen.WaypointScreen;
 import de.maxhenkel.coordinatehud.screen.WaypointsScreen;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
@@ -19,9 +19,9 @@ public class KeyEvents {
 
     public static void init() {
         CATEGORY_COORDINATE_HUD = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(CoordinateHUD.MODID, "coordinatehud"));
-        HIDE_HUD = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.hide_hud", InputConstants.UNKNOWN.getValue(), CATEGORY_COORDINATE_HUD));
-        WAYPOINTS = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.waypoints", GLFW.GLFW_KEY_M, CATEGORY_COORDINATE_HUD));
-        CREATE_WAYPOINT = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.coordinatehud.create_waypoint", InputConstants.UNKNOWN.getValue(), CATEGORY_COORDINATE_HUD));
+        HIDE_HUD = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.coordinatehud.hide_hud", InputConstants.UNKNOWN.getValue(), CATEGORY_COORDINATE_HUD));
+        WAYPOINTS = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.coordinatehud.waypoints", GLFW.GLFW_KEY_M, CATEGORY_COORDINATE_HUD));
+        CREATE_WAYPOINT = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.coordinatehud.create_waypoint", InputConstants.UNKNOWN.getValue(), CATEGORY_COORDINATE_HUD));
     }
 
     public static void onTick(Minecraft mc) {
